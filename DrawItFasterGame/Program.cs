@@ -1,9 +1,17 @@
 using DrawItFasterGame.Hubs;
+using Microsoft.EntityFrameworkCore;
+using DrawItFaster.DAL;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<DrawItDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<WordRepository>();
 
 var app = builder.Build();
 
