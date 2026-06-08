@@ -10,8 +10,13 @@
 <input id="usernameInput" placeholder="Username" />
 
 <button id="joinButton">Join Game</button>
-<button onclick="sendTestMessage()">Testa SignalR</button>
+<button onclick="sendTestMessage()">Test SignalR</button>
 
+
+<h3>Players</h3>
+<ul id="playersList"></ul>
+
+<h3>Messages</h3>
 <ul id="messagesList"></ul>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
@@ -33,6 +38,19 @@
     const li = document.createElement("li");
     li.textContent = user + ": " + message;
     document.getElementById("messagesList").appendChild(li);
+    });
+
+    // NYTT: uppdaterar spelarlistan realtime
+    connection.on("UpdatePlayerList", function (players) {
+    const list = document.getElementById("playersList");
+    // empty list
+    list.innerHTML = "";
+    // Loop players
+    players.forEach(function (player) {
+    const li = document.createElement("li");
+    li.textContent = player;
+    list.appendChild(li);
+    });
     });
 
     connection.start();
