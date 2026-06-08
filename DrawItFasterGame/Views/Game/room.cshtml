@@ -12,6 +12,13 @@
 <button id="joinButton">Join Game</button>
 <button onclick="sendTestMessage()">Test SignalR</button>
 
+<h3>DrawingBoard</h3>
+
+<canvas id="drawingCanvas"
+        width="800"
+        height="500"
+        style="border:1px solid black;">
+</canvas>
 
 <h3>Players</h3>
 <ul id="playersList"></ul>
@@ -23,6 +30,39 @@
 
 <script>
     const gameId = "@gameId";
+
+    const canvas = document.getElementById("drawingCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let isDrawing = false;
+
+    let lastX = 0;
+    let lastY = 0;
+
+    canvas.addEventListener("mousedown", function (event) {
+    isDrawing = true;
+
+    lastX = event.offsetX;
+    lastY = event.offsetY;
+    });
+
+    canvas.addEventListener("mousemove", function (event) {
+    if (!isDrawing) {
+    return;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(event.offsetX, event.offsetY);
+    ctx.stroke();
+
+    lastX = event.offsetX;
+    lastY = event.offsetY;
+    });
+
+    canvas.addEventListener("mouseup", function () {
+    isDrawing = false;
+    });
 
     const connection = new signalR.HubConnectionBuilder()
     .withUrl("/gamehub")
