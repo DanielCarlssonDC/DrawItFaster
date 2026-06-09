@@ -32,7 +32,7 @@ public class GameHub : Hub
 	}
 	public async Task SendDrawingData(string gameId, object drawingData)
 	{
-		await Clients.Group(gameId).SendAsync("ReceiveDrawingData", drawingData);
+		await Clients.OthersInGroup(gameId).SendAsync("ReceiveDrawingData", drawingData);
 	}
 	public async Task SendGuess(string gameId, string username, string guess)
 	{

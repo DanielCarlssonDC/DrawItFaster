@@ -56,6 +56,14 @@
     ctx.lineTo(event.offsetX, event.offsetY);
     ctx.stroke();
 
+    // Skicka ritlinjen till SignalR
+    connection.invoke("SendDrawingData", gameId, {
+    startX: lastX,
+    startY: lastY,
+    endX: event.offsetX,
+    endY: event.offsetY
+    });
+
     lastX = event.offsetX;
     lastY = event.offsetY;
     });
@@ -80,7 +88,15 @@
     document.getElementById("messagesList").appendChild(li);
     });
 
-    // NYTT: uppdaterar spelarlistan realtime
+    // Uppdatera ritning realtime
+    connection.on("ReceiveDrawingData", function (data) {
+    ctx.beginPath();
+    ctx.moveTo(data.startX, data.startY);
+    ctx.lineTo(data.endX, data.endY);
+    ctx.stroke();
+    });
+
+    // Uppdaterar spelarlistan realtime
     connection.on("UpdatePlayerList", function (players) {
     const list = document.getElementById("playersList");
     // empty list
