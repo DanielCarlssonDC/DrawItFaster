@@ -16,9 +16,25 @@ body {
     overflow: hidden;
 }
 
+.card {
+    background-color: white;
+    opacity: 0.2;
+    border-radius: 5rem;
+}
+
 header {
     flex-shrink: 0;
-    padding: 4rem 0 2rem;
+}
+
+.logo {
+    max-height: 10rem;
+    width: auto;
+    margin: 4rem 0 3rem;
+}
+
+.flatlogo {
+    max-height: 5rem;
+    width: auto;
 }
 
 .content-wrapper {
