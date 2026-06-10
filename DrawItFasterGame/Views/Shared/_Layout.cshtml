@@ -17,20 +17,24 @@
         var username = Context.Session.GetString("Username");
         var profilePic = Context.Session.GetString("ProfilePic");
     }
-            <header class="position-relative">
-                <div class="flex-grow-1">
-                    <a class="navbar-brand position-absolute top-50 start-50 translate-middle" asp-area="" asp-controller="Home" asp-action="Index">
-                        @if (ViewData["IsGameView"] != null && (bool)ViewData["IsGameView"] == true)
+            <header class="row align-items-center w-100 m-0 px-3 py-3">
+
+                <div class="col"></div>
+
+                <div class="col-auto text-center p-0">
+                    <a class="navbar-brand m-0" asp-area="" asp-controller="Home" asp-action="Index">
+                        @if (ViewData["IsGameView"] == null) //&& (bool)ViewData["IsGameView"] == true)
                             {
-                                <img src="~/images/Logo.png" alt="DrawItFaster" />
+                                <img class="logo" src="~/images/Logo.png" alt="DrawItFaster" />
                             } 
                             else {
-                                <img src="~/images/LogoFlat.png" alt="DrawItFaster" />
+                                <img class="logoflat" src="~/images/LogoFlat.png" alt="DrawItFaster" />
                             }
                     </a>
                 </div>
 
-                
+                <div class="col d-flex justify-content-end">
+
                     <div class="headerLoggedIn dropdown ms-auto">
                         <a class="nav-link dropdown-toggle d-flex align-items-center"
                            href="#"
@@ -38,13 +42,20 @@
                            data-bs-toggle="dropdown"
                            aria-expanded="false">
 
-                            <img src="@profilePic" alt="Profile Picture" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
-                            <span>@username</span>
+                            @if (!string.IsNullOrEmpty(profilePic))
+                            {
+                                <img src="@profilePic" alt="Profile Picture" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <i class="bi bi-person-circle fs-3 me-2 text-dark"></i>
+                            }
+                            <span class="text-dark">@(string.IsNullOrEmpty(username) ? "Spelare" : username)</span>
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li class="dropdown-item text-muted">Signed in as</li>
-                            <li class="dropdown-item fw-bold">@username</li>
+                            <li class="dropdown-item fw-bold">@(string.IsNullOrEmpty(username) ? "Spelare" : username)</li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
@@ -59,7 +70,7 @@
                             </li>
                         </ul>
                     </div>
-                
+                </div>
             </header>
         
     
