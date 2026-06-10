@@ -3,6 +3,9 @@
     var gameId = ViewBag.GameId;
 }
 
+<input id="gameIdInput" placeholder="Game ID to join" />
+<button id="joinRoomButton">Join Room</button>
+
 <h2>Game Room</h2>
 
 <p>Game ID: <strong>@gameId</strong></p>
@@ -13,6 +16,14 @@
 <button onclick="sendTestMessage()">Test SignalR</button>
 
 <h3>DrawingBoard</h3>
+
+<label>Color:</label>
+<input type="color" id="colorPicker" value="#000000" />
+
+<label>Brush size:</label>
+<input type="range" id="brushSize" min="1" max="20" value="2" />
+
+<button id="eraserButton">Eraser</button>
 
 <canvas id="drawingCanvas"
         width="800"
@@ -31,8 +42,33 @@
 <script>
     const gameId = "@gameId";
 
+    const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/gamehub")
+    .build();
+
     const canvas = document.getElementById("drawingCanvas");
     const ctx = canvas.getContext("2d");
+
+    const colorPicker = document.getElementById("colorPicker");
+    const brushSize = document.getElementById("brushSize");
+    const eraserButton = document.getElementById("eraserButton");
+
+    let currentColor = "#000000";
+    let currentSize = 2;
+    let isErasing = false;
+
+    colorPicker.addEventListener("change", function () {
+    currentColor = colorPicker.value;
+    isErasing = false;
+    });
+
+    brushSize.addEventListener("change", function () {
+    currentSize = brushSize.value;
+    });
+
+    eraserButton.addEventListener("click", function () {
+    isErasing = true;
+    });
 
     let isDrawing = false;
 
@@ -54,6 +90,8 @@
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(event.offsetX, event.offsetY);
+    ctx.strokeStyle = isErasing ? "#ffffff" : currentColor;
+    ctx.lineWidth = currentSize;
     ctx.stroke();
 
     // Skicka ritlinjen till SignalR
@@ -61,7 +99,9 @@
     startX: lastX,
     startY: lastY,
     endX: event.offsetX,
-    endY: event.offsetY
+    endY: event.offsetY,
+    color: isErasing ? "#ffffff" : currentColor,
+    size: currentSize
     });
 
     lastX = event.offsetX;
@@ -71,10 +111,6 @@
     canvas.addEventListener("mouseup", function () {
     isDrawing = false;
     });
-
-    const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/gamehub")
-    .build();
 
     connection.on("PlayerJoined", function (username) {
     const li = document.createElement("li");
@@ -93,6 +129,10 @@
     ctx.beginPath();
     ctx.moveTo(data.startX, data.startY);
     ctx.lineTo(data.endX, data.endY);
+
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth = data.size;
+
     ctx.stroke();
     });
 
@@ -114,6 +154,14 @@
     document.getElementById("joinButton").addEventListener("click", function () {
     const username = document.getElementById("usernameInput").value || "Unknown";
     connection.invoke("JoinGame", gameId, username);
+    });
+
+    document.getElementById("joinRoomButton").addEventListener("click", function () {
+    const roomId = document.getElementById("gameIdInput").value;
+
+    if (roomId) {
+    window.location.href = "/game/room?gameId=" + roomId;
+    }
     });
 
     function sendTestMessage() {
