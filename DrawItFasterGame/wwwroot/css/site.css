@@ -16,10 +16,29 @@ body {
     overflow: hidden;
 }
 
+.login-page-wrapper {
+    display: flex;
+    justify-content: center;
+    min-height: 80vh;
+    width: 100%;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 25rem;
+    display: flex;
+    flex-direction: column;
+}
+.element-box {
+    background-color: #3d255d;
+    border: 1px solid #3C3C3C;
+    border-radius: 20px;
+    padding: 3rem;
+}
 .card {
     background-color: white;
-    opacity: 0.2;
-    border-radius: 5rem;
+    opacity: 0.6;
+    border-radius: 1rem;
 }
 
 header {

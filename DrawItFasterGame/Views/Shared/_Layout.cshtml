@@ -23,19 +23,19 @@
 
                 <div class="col-auto text-center p-0">
                     <a class="navbar-brand m-0" asp-area="" asp-controller="Home" asp-action="Index">
-                        @if (ViewData["IsGameView"] == null) //&& (bool)ViewData["IsGameView"] == true)
+                        @if (ViewData["IsGameView"] != null && (bool)ViewData["IsGameView"] == true)
                             {
-                                <img class="logo" src="~/images/Logo.png" alt="DrawItFaster" />
+                                <img class="logoflat" src="~/images/LogoFlat.png" alt="DrawItFaster" />
                             } 
                             else {
-                                <img class="logoflat" src="~/images/LogoFlat.png" alt="DrawItFaster" />
+                                <img class="logo" src="~/images/Logo.png" alt="DrawItFaster" />
                             }
                     </a>
                 </div>
 
                 <div class="col d-flex justify-content-end">
 
-                    <div class="headerLoggedIn dropdown ms-auto">
+                    <div class="headerLoggedIn dropdown ms-auto card p-2">
                         <a class="nav-link dropdown-toggle d-flex align-items-center"
                            href="#"
                            role="button"
