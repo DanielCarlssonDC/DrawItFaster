@@ -1,0 +1,20 @@
+﻿@model List<DrawItFasterGame.Services.GamePlayer>
+@{
+    // List with players in lobby
+    var game = ViewBag.Game as DrawItFasterGame.Services.Game;
+}
+
+@foreach (var player in Model)
+{
+    <tr>
+        <td class="text-neon-green">
+            @player.Username
+        </td>
+        <td>
+            @if (game != null && game.HostId == player.UserId)
+            {
+                <span class="badge bg-primary float-end">Host</span>
+            }
+        </td>
+    </tr>
+}
