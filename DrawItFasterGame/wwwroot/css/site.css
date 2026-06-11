@@ -10,7 +10,7 @@ html, body {
 body {
     background-image: url("../Images/pattern.png"), linear-gradient(120deg, rgba(61, 37, 93, 1) 0%, rgba(79, 0, 182, 1) 100%);
     background-repeat: repeat, no-repeat;
-    background-size: 150px, cover;
+    background-size: 250px, cover;
 }
 
 .app-layout {
