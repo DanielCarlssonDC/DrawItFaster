@@ -1,34 +1,4 @@
 ﻿@{
-    ViewData["Title"] = "Register user";
+    ViewData["Title"] = "Home";
 }
 
-<div class="login-page-wrapper">
-
-    <form class="login-card element-box" method="post" asp-action="CreateUser" asp-controller="Account">
-        <h2 class="text-center mb-4">Register</h2>
-
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger text-center" role="alert">
-                @ViewBag.Error
-            </div>
-        }
-
-        <div class="mb-3">
-            <label class="form-label">Username:</label>
-            <input class="form-control custom-input" type="text" name="Username" autofocus />
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label">Password:</label>
-            <input class="form-control custom-input" type="password" name="password" />
-        </div>
-
-        <button class="btn btn-custom-blue w-100 mb-3" type="submit">Register</button>
-
-        <div class="text-center">
-            <a asp-controller="Account" asp-action="LogIn" class="register-link">Already a user? Log in</a>
-        </div>
-    </form>
-
-</div>
