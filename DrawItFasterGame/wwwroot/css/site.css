@@ -5,6 +5,7 @@ html, body {
 
 :root {
     --color-btn-blue: rgb(10, 0, 171);
+    --color-light-purple: #744CA8;
 }
 
 body {
@@ -56,12 +57,12 @@ body {
     flex-direction: column;
 }
 .element-box {
-    background-color: #744CA8;
+    background-color: var(--color-light-purple);
     border-radius: 20px;
     padding: 3rem;
 }
 .card {
-    background-color: #744CA8;
+    background-color: var(--color-light-purple);
     border-radius: 20px;
     padding: 1rem;
 }
