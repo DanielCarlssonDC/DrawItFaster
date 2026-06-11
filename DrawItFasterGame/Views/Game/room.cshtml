@@ -36,7 +36,8 @@
 <h3>Players</h3>
 <ul id="playersList"></ul>
 
-<button id="startRoundButton">Start Round</button>
+<button id="startGameButton">Start Game</button>
+
 <div id="wordOptions"></div>
 
 <h3>Guesses</h3>
@@ -68,7 +69,7 @@
     const eraserButton = document.getElementById("eraserButton");
     const clearCanvasButton = document.getElementById("clearCanvasButton");
     // för ordavl
-    const startRoundButton = document.getElementById("startRoundButton");
+    const startGameButton = document.getElementById("startGameButton");
     const wordOptions = document.getElementById("wordOptions");
 
     let currentColor = "#000000";
@@ -90,6 +91,8 @@
 
     let isDrawing = false;
 
+    let isDrawer = false;
+
     let lastX = 0;
     let lastY = 0;
 
@@ -101,7 +104,7 @@
     });
 
     canvas.addEventListener("mousemove", function (event) {
-        if (!isDrawing) {
+        if (!isDrawing || !isDrawer) {
         return;
     }
 
@@ -156,6 +159,84 @@
 
         document.getElementById("guessList").appendChild(li);
 
+    });
+
+    // När ord väljs och rundan startar
+    connection.on("WordSelected", function () {
+        const li = document.createElement("li");
+        li.textContent = "Round started!";
+
+        document.getElementById("messagesList").appendChild(li);
+    });
+
+    connection.on("DrawerSelected", function (username) {
+
+        const myUsername =
+            document.getElementById("usernameInput").value;
+
+        isDrawer = false;
+        wordOptions.innerHTML = "";
+
+        if (myUsername === username) {
+
+            isDrawer = true;
+
+            // Ritaren ska inte kunna gissa
+            document.getElementById("guessInput").disabled = true;
+            document.getElementById("guessButton").disabled = true;
+
+            const li = document.createElement("li");
+            li.textContent = "You are drawing this round!";
+            document.getElementById("messagesList").appendChild(li);
+
+            // Hämtar 3 ord ENDAST för ritaren
+            fetch("/api/WordAPI/random")
+                .then(response => response.json())
+                .then(words => {
+
+                    wordOptions.innerHTML = "";
+
+                    words.forEach(function (word) {
+
+                        const button = document.createElement("button");
+
+                        button.textContent = word;
+
+                        button.addEventListener("click", function () {
+
+                            connection.invoke(
+                                "SelectWord",
+                                gameId,
+                                username,
+                                word
+                            );
+
+                            wordOptions.innerHTML =
+                                "Selected word: " + word;
+                        });
+
+                        wordOptions.appendChild(button);
+                    });
+                });
+
+        } else {
+
+            // Gissare ska inte se orden
+            wordOptions.innerHTML = "";
+
+            // Gissare ska kunna gissa
+            document.getElementById("guessInput").disabled = false;
+            document.getElementById("guessButton").disabled = false;
+        }
+    });
+
+    // När någon gissar rätt
+    connection.on("CorrectGuess", function (username) {
+
+        const li = document.createElement("li");
+        li.textContent = username + " guessed the correct word!";
+    
+        document.getElementById("messagesList").appendChild(li);
     });
 
     // Uppdatera ritning realtime
@@ -222,31 +303,12 @@
 
     });
 
-    startRoundButton.addEventListener("click", function () {
+    startGameButton.addEventListener("click", function () {
 
-        fetch("/api/WordAPI/random")
-            .then(response => response.json())
-            .then(words => {
-
-                wordOptions.innerHTML = "";
-
-                words.forEach(function (word) {
-
-                    const button = document.createElement("button");
-
-                    button.textContent = word;
-                    button.addEventListener("click", function () {
-
-                    wordOptions.innerHTML =
-                        "Selected word: " + word;
-
-            });
-
-            wordOptions.appendChild(button);
-
-        });
-
-    });
+        connection.invoke(
+            "StartGame",
+            gameId
+        );
 
     });
 

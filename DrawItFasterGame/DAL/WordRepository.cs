@@ -17,12 +17,16 @@ namespace DrawItFaster.DAL
 
         public List<string> GetThreeRandomWords()
         {
-            // Mix, extract text, take 3, convert to list
-            return _context.Words
-                .OrderBy(w => Guid.NewGuid())
-                .Select(w => w.WordString)
-                .Take(3)
-                .ToList();
-        }
+			// Hämtar alla ord från databasen
+			List<string> allWords = _context.Words
+				.Select(w => w.WordString)
+				.ToList();
+
+			// Slumpar 3 ord 
+			return allWords
+				.OrderBy(w => Guid.NewGuid())
+				.Take(3)
+				.ToList();
+		}
     }
 }
