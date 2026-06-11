@@ -25,7 +25,16 @@
     }
             <header class="row align-items-center w-100 m-0 px-3 py-3">
 
-                <div class="col"></div>
+                <div class="col d-flex justify-content-start">
+                    @if (ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" &&
+                                ViewContext.RouteData.Values["Action"]?.ToString() == "Index")
+                    {
+                        <a href="@Url.Action("Leaderboard", "Home")" class="card text-decoration-none offwhite d-flex flex-row align-items-center gap-2 p-4 my-auto transition-hover">
+                            <img src="~/images/podium.png" alt="Podium" style="width: 35px; height: 35px; object-fit: contain;">
+                            <span class="pe-2">Leaderboard</span>
+                        </a>
+                    }
+                </div>
 
                 <div class="col-auto text-center p-0">
                     <a class="navbar-brand m-0" asp-area="" asp-controller="Home" asp-action="Index">
