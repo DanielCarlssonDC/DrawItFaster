@@ -1,0 +1,48 @@
+﻿@model List<DrawItFasterGame.Models.User>
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+
+    <div class="card p-4 shadow-lg">
+
+        <div class="d-flex align-items-center justify-content-center gap-3 mb-4">
+            <img src="~/images/podium.png" alt="Podium" style="width: 45px; object-fit: contain;">
+            <h2 class="text-white fw-bold m-0">Leaderboard</h2>
+        </div>
+
+        <table class="table table-borderless text-white align-middle mb-4">
+            <thead class="border-bottom" style="border-color: rgba(255,255,255,0.2) !important;">
+                <tr>
+                    <th class="py-2 text-uppercase" style="letter-spacing: 1px; font-size: 0.9rem;">Spelare</th>
+                    <th class="py-2 text-end text-uppercase" style="letter-spacing: 1px; font-size: 0.9rem;">Highscore</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var player in Model)
+                {
+                    <tr class="border-bottom" style="border-color: rgba(255,255,255,0.1) !important;">
+                        <td class="py-3">
+                            <div class="d-flex align-items-center gap-3">
+                                @if (!string.IsNullOrEmpty(player.ProfilePictureUrl))
+                                {
+                                    <img src="@player.ProfilePictureUrl" class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; background-color: #333;">
+                                }
+                                else
+                                {
+                                    <i class="bi bi-person-circle fs-1 text-dark" style="line-height: 1;"></i>
+                                }
+                                <span class="fw-bold fs-5">@player.Username</span>
+                            </div>
+                        </td>
+
+                        <td class="py-3 text-end fw-bold text-warning fs-4">
+                            @player.Highscore
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
