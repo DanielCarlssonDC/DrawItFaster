@@ -2,3 +2,25 @@
     ViewData["Title"] = "Home";
 }
 
+<div class="container" style="max-width: 600px;">
+
+    <div class="element-box text-center">
+        <h2 class="text-center mb-4">Join Game</h2>
+
+        <form asp-controller="Lobby" asp-action="JoinGame" method="post" class="mb-4 mt-4">
+            <div class="mb-3">
+                <input type="number" name="gameCode" class="py-2 text-center" placeholder="GAME CODE..." value="" style="min-width: 200px;">
+            </div>
+            <button type="submit" class="btn rounded py-2 mb-4" style="min-width: 200px;">Join Lobby</button>
+        </form>
+
+        <h2 class="mb-4">Host Game</h2>
+
+        <form asp-controller="Lobby" asp-action="CreateGame" method="post">
+            <button type="submit" class="btn btn-custom-blue px-5 py-2 mb-0" style="min-width: 200px;">
+                Create Lobby
+            </button>
+        </form>
+
+    </div>
+</div>
