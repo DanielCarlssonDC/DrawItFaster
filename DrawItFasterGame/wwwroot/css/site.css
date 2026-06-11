@@ -1,22 +1,104 @@
-html {
-  font-size: 14px;
+html, body {
+    margin: 0;
+    padding: 0;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+:root {
+    --color-btn-blue: rgb(10, 0, 171);
 }
 
 body {
-  margin-bottom: 60px;
+    background-image: url("../Images/pattern.png"), linear-gradient(120deg, rgba(61, 37, 93, 1) 0%, rgba(79, 0, 182, 1) 100%);
+    background-repeat: repeat, no-repeat;
+    background-size: 250px, cover;
+}
+
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.login-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1;
+    width: 100%;
+}
+
+.pangolin-regular, h1, body, h2, h3, h4, h5, h6, p, a {
+    font-family: "Pangolin", cursive;
+    font-weight: 400;
+    font-style: normal;
+    color: white;
+}
+
+.btn {
+    color: white;
+    background-color: var(--color-btn-blue);
+}
+
+.btn:hover {
+    background-color: rgb(6, 0, 108);
+    color: white;
+}
+
+.offwhite {
+    color: #e7e7e7;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 25rem;
+    display: flex;
+    flex-direction: column;
+}
+.element-box {
+    background-color: #744CA8;
+    border-radius: 20px;
+    padding: 3rem;
+}
+.card {
+    background-color: #744CA8;
+    border-radius: 20px;
+    padding: 1rem;
+}
+
+header {
+    flex-shrink: 0;
+}
+
+.logo {
+    max-height: 10rem;
+    width: auto;
+    margin: 2rem 0 1rem;
+}
+
+.flatlogo {
+    max-height: 5rem;
+    width: auto;
+}
+
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
 }
