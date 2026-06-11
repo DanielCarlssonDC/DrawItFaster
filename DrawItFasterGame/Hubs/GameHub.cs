@@ -38,4 +38,9 @@ public class GameHub : Hub
 	{
 		await Clients.Group(gameId).SendAsync("ReceiveGuess", username, guess);
 	}
+
+	public async Task ClearCanvas(string gameId)
+	{
+		await Clients.OthersInGroup(gameId).SendAsync("CanvasCleared");
+	}
 }

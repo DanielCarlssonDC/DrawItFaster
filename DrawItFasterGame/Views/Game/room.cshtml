@@ -3,6 +3,9 @@
     var gameId = ViewBag.GameId;
 }
 
+<input id="gameIdInput" placeholder="Game ID to join" />
+<button id="joinRoomButton">Join Room</button>
+
 <h2>Game Room</h2>
 
 <p>Game ID: <strong>@gameId</strong></p>
@@ -14,6 +17,16 @@
 
 <h3>DrawingBoard</h3>
 
+<label>Color:</label>
+<input type="color" id="colorPicker" value="#000000" />
+
+<label>Brush size:</label>
+<input type="range" id="brushSize" min="1" max="20" value="2" />
+
+<button id="eraserButton">Eraser</button>
+
+<button id="clearCanvasButton">Clear</button>
+
 <canvas id="drawingCanvas"
         width="800"
         height="500"
@@ -23,6 +36,18 @@
 <h3>Players</h3>
 <ul id="playersList"></ul>
 
+<button id="startRoundButton">Start Round</button>
+<div id="wordOptions"></div>
+
+<h3>Guesses</h3>
+
+<input id="guessInput" placeholder="Gissa Ordet" />
+
+<button id="guessButton">Guess</button>
+
+<ul id="guessList"></ul>
+
+
 <h3>Messages</h3>
 <ul id="messagesList"></ul>
 
@@ -31,8 +56,37 @@
 <script>
     const gameId = "@gameId";
 
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/gamehub")
+        .build();
+
     const canvas = document.getElementById("drawingCanvas");
     const ctx = canvas.getContext("2d");
+
+    const colorPicker = document.getElementById("colorPicker");
+    const brushSize = document.getElementById("brushSize");
+    const eraserButton = document.getElementById("eraserButton");
+    const clearCanvasButton = document.getElementById("clearCanvasButton");
+    // för ordavl
+    const startRoundButton = document.getElementById("startRoundButton");
+    const wordOptions = document.getElementById("wordOptions");
+
+    let currentColor = "#000000";
+    let currentSize = 2;
+    let isErasing = false;
+
+    colorPicker.addEventListener("change", function () {
+        currentColor = colorPicker.value;
+        isErasing = false;
+    });
+
+    brushSize.addEventListener("change", function () {
+        currentSize = brushSize.value;
+    });
+
+    eraserButton.addEventListener("click", function () {
+        isErasing = true;
+    });
 
     let isDrawing = false;
 
@@ -40,52 +94,68 @@
     let lastY = 0;
 
     canvas.addEventListener("mousedown", function (event) {
-    isDrawing = true;
+        isDrawing = true;
 
-    lastX = event.offsetX;
-    lastY = event.offsetY;
+        lastX = event.offsetX;
+        lastY = event.offsetY;
     });
 
     canvas.addEventListener("mousemove", function (event) {
-    if (!isDrawing) {
-    return;
+        if (!isDrawing) {
+        return;
     }
 
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(event.offsetX, event.offsetY);
+    ctx.strokeStyle = isErasing ? "#ffffff" : currentColor;
+    ctx.lineWidth = currentSize;
     ctx.stroke();
 
     // Skicka ritlinjen till SignalR
     connection.invoke("SendDrawingData", gameId, {
-    startX: lastX,
-    startY: lastY,
-    endX: event.offsetX,
-    endY: event.offsetY
+        startX: lastX,
+        startY: lastY,
+        endX: event.offsetX,
+        endY: event.offsetY,
+        color: isErasing ? "#ffffff" : currentColor,
+        size: currentSize
     });
 
-    lastX = event.offsetX;
-    lastY = event.offsetY;
+        lastX = event.offsetX;
+        lastY = event.offsetY;
     });
 
     canvas.addEventListener("mouseup", function () {
-    isDrawing = false;
+        isDrawing = false;
     });
 
-    const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/gamehub")
-    .build();
+    clearCanvasButton.addEventListener("click", function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    connection.invoke("ClearCanvas", gameId);
+    });
 
     connection.on("PlayerJoined", function (username) {
-    const li = document.createElement("li");
-    li.textContent = username + " joined the game";
-    document.getElementById("messagesList").appendChild(li);
+        const li = document.createElement("li");
+        li.textContent = username + " joined the game";
+        document.getElementById("messagesList").appendChild(li);
     });
 
     connection.on("ReceiveMessage", function (user, message) {
-    const li = document.createElement("li");
-    li.textContent = user + ": " + message;
-    document.getElementById("messagesList").appendChild(li);
+        const li = document.createElement("li");
+        li.textContent = user + ": " + message;
+        document.getElementById("messagesList").appendChild(li);
+    });
+
+    connection.on("ReceiveGuess", function (username, guess) {
+
+        const li = document.createElement("li");
+
+        li.textContent = username + " guessed: " + guess;
+
+        document.getElementById("guessList").appendChild(li);
+
     });
 
     // Uppdatera ritning realtime
@@ -93,35 +163,101 @@
     ctx.beginPath();
     ctx.moveTo(data.startX, data.startY);
     ctx.lineTo(data.endX, data.endY);
+
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth = data.size;
+
     ctx.stroke();
+    });
+
+    // tar emot signal från servern att cleara canvas
+    connection.on("CanvasCleared", function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
     // Uppdaterar spelarlistan realtime
     connection.on("UpdatePlayerList", function (players) {
-    const list = document.getElementById("playersList");
-    // empty list
-    list.innerHTML = "";
+        const list = document.getElementById("playersList");
+        // empty list
+        list.innerHTML = "";
     // Loop players
     players.forEach(function (player) {
-    const li = document.createElement("li");
-    li.textContent = player;
-    list.appendChild(li);
+        const li = document.createElement("li");
+        li.textContent = player;
+        list.appendChild(li);
     });
     });
 
     connection.start();
 
     document.getElementById("joinButton").addEventListener("click", function () {
-    const username = document.getElementById("usernameInput").value || "Unknown";
-    connection.invoke("JoinGame", gameId, username);
+        const username = document.getElementById("usernameInput").value || "Unknown";
+        connection.invoke("JoinGame", gameId, username);
     });
 
+    document.getElementById("joinRoomButton").addEventListener("click", function () {
+        const roomId = document.getElementById("gameIdInput").value;
+
+            if (roomId) {
+                window.location.href = "/game/room?gameId=" + roomId;
+            }
+    });
+
+    // Skicka en gissning till SignalR
+    document.getElementById("guessButton").addEventListener("click", function () {
+
+        const username = document.getElementById("usernameInput").value || "Unknown";
+
+        const guess = document.getElementById("guessInput").value;
+
+        connection.invoke(
+            "SendGuess",
+            gameId,
+            username,
+            guess
+        );
+
+        // nollställ fält för gissning efter gissning
+        document.getElementById("guessInput").value = "";
+
+    });
+
+    startRoundButton.addEventListener("click", function () {
+
+        fetch("/api/WordAPI/random")
+            .then(response => response.json())
+            .then(words => {
+
+                wordOptions.innerHTML = "";
+
+                words.forEach(function (word) {
+
+                    const button = document.createElement("button");
+
+                    button.textContent = word;
+                    button.addEventListener("click", function () {
+
+                    wordOptions.innerHTML =
+                        "Selected word: " + word;
+
+            });
+
+            wordOptions.appendChild(button);
+
+        });
+
+    });
+
+    });
+
+
     function sendTestMessage() {
-    connection.invoke(
-    "SendMessage",
-    gameId,
-    "Martin",
-    "Hej från SignalR"
+        connection.invoke(
+        "SendMessage",
+        gameId,
+        "Martin",
+        "Hej från SignalR"
     );
+
     }
 </script>
