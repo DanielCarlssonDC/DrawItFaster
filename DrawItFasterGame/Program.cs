@@ -41,7 +41,7 @@ app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=CreateUser}/{id?}");
+    pattern: "{controller=Account}/{action=LogIn}/{id?}");
 
 app.MapHub<GameHub>("/gamehub");
 
