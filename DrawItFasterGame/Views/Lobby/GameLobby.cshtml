@@ -1,0 +1,100 @@
+﻿@model List<DrawItFasterGame.Services.GamePlayer>
+@{
+    ViewData["Title"] = "Game Lobby";
+
+    var game = ViewBag.Game as DrawItFasterGame.Services.Game;
+    var currentUserId = (int)ViewBag.CurrentUserId;
+
+    // Check if the current user is host
+    bool isHost = (game.HostId == currentUserId);
+}
+
+<div class="container" style="max-width: 600px;">
+    <div class="element-box">
+        <h2 class="text-center mb-2">Lobby #@game.GameCode</h2>
+
+        <div class="d-flex justify-content-center gap-2 mb-4 mt-4">
+            @if (isHost)
+            {
+                @* Start game (host) *@
+                <form asp-action="StartGame" asp-route-gameCode="@game.GameCode" method="post">
+                    <button type="submit" class="btn btn-success fw-bold px-5 py-2">Start</button>
+                </form>
+
+                @* Cancel game (host) *@
+                <form asp-action="CancelGame" asp-route-gameCode="@game.GameCode" method="post">
+                    <button type="submit" class="btn btn-danger fw-bold px-5 py-2">Cancel</button>
+                </form>
+            }
+            else
+            {
+                <p class="text-center mb-0 text-white"><i>Waiting for host to start...</i></p>
+
+                @* Leave lobby (player) *@
+                <form asp-action="LeaveGame" asp-route-gameCode="@game.GameCode" method="post">
+                    <button type="submit" class="btn btn-danger fw-bold px-5 py-2">Leave</button>
+                </form>
+            }
+        </div>
+
+        <table class="table text-white">
+            <thead>
+                <tr>
+                    <th>Players: (<span id="playerCount">@Model.Count</span> / 16)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="gamesBody">
+                @await Html.PartialAsync("_LobbyPlayersPartial", Model)
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        const gameCode = '@game.GameCode';
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/gameHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("GameStarted", (startedGameCode) => {
+            console.log("GameStarted:", startedGameCode);
+            window.location.href = `/Game/Game?gameId=${startedGameCode}`;
+        });
+
+        async function loadPlayers() {
+            // send gameCode to partialview
+            const resp = await fetch(`/Lobby/PlayersList?gameCode=${gameCode}`);
+            const html = await resp.text();
+            document.getElementById("gamesBody").innerHTML = html;
+
+            document.getElementById("playerCount").innerText =
+                document.querySelectorAll("#gamesBody tr").length;
+        }
+
+        connection.on("LobbyPlayersUpdated", () => {
+            loadPlayers();
+        });
+
+        connection.on("UpdatePlayerList", () => {
+            loadPlayers();
+        });
+
+        connection.on("LobbyCancelled", () => {
+            window.location.href = `/Home/Index`;
+        });
+
+        connection.start()
+            .then(() => {
+                console.log("SignalR connected", connection.connectionId);
+                return connection.invoke("JoinGame", gameCode, '@ViewBag.Username');
+            })
+            .then(() => loadPlayers())
+            .catch(err => console.error("SignalR error:", err));
+
+    </script>
+}
