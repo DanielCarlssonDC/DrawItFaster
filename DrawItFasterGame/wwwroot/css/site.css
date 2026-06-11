@@ -3,6 +3,10 @@ html, body {
     padding: 0;
 }
 
+:root {
+    --color-btn-blue: rgb(10, 0, 171);
+}
+
 body {
     background-image: url("../Images/pattern.png"), linear-gradient(120deg, rgba(61, 37, 93, 1) 0%, rgba(79, 0, 182, 1) 100%);
     background-repeat: repeat, no-repeat;
@@ -19,8 +23,30 @@ body {
 .login-page-wrapper {
     display: flex;
     justify-content: center;
-    min-height: 80vh;
+    align-items: flex-start;
+    flex: 1;
     width: 100%;
+}
+
+.pangolin-regular, h1, body, h2, h3, h4, h5, h6, p, a {
+    font-family: "Pangolin", cursive;
+    font-weight: 400;
+    font-style: normal;
+    color: white;
+}
+
+.btn {
+    color: white;
+    background-color: var(--color-btn-blue);
+}
+
+.btn:hover {
+    background-color: rgb(6, 0, 108);
+    color: white;
+}
+
+.offwhite {
+    color: #e7e7e7;
 }
 
 .login-card {
@@ -30,15 +56,14 @@ body {
     flex-direction: column;
 }
 .element-box {
-    background-color: #3d255d;
-    border: 1px solid #3C3C3C;
+    background-color: #744CA8;
     border-radius: 20px;
     padding: 3rem;
 }
 .card {
-    background-color: white;
-    opacity: 0.6;
-    border-radius: 1rem;
+    background-color: #744CA8;
+    border-radius: 20px;
+    padding: 1rem;
 }
 
 header {
@@ -48,7 +73,7 @@ header {
 .logo {
     max-height: 10rem;
     width: auto;
-    margin: 4rem 0 3rem;
+    margin: 2rem 0 1rem;
 }
 
 .flatlogo {
@@ -64,6 +89,8 @@ header {
 
 main {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
