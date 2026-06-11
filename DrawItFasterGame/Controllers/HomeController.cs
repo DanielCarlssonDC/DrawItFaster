@@ -1,16 +1,17 @@
-using System.Diagnostics;
+using DrawItFaster.DAL;
 using DrawItFasterGame.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace DrawItFasterGame.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly DrawItDbContext _context;
+        public HomeController(DrawItDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -18,9 +19,14 @@ namespace DrawItFasterGame.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public IActionResult Leaderboard()
         {
-            return View();
+            var topPlayers = _context.Users
+                .OrderByDescending(u => u.Highscore)
+                .ToList();
+
+            return View(topPlayers);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
