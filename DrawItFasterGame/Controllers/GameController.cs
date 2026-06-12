@@ -1,20 +1,27 @@
-﻿using Microsoft.AspNetCore.Http.Metadata;
+﻿using DrawItFasterGame.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DrawItFasterGame.Controllers
 {
-	public class GameController : Controller
-	{
-		public IActionResult Room(string gameId)
-		{
+    public class GameController : Controller
+    {
+        [HttpGet]
+        public IActionResult Room(string gameId) // Behåller gameId som parameter för att matcha din befintliga kod
+        {
+            // Sätter loggan korrekt i headern
+            ViewData["IsGameView"] = true;
 
-			if (string.IsNullOrWhiteSpace(gameId)){
-				gameId = Guid.NewGuid().ToString("N").Substring(0, 6);
-			}
+            if (GameManager.ActiveGames.TryGetValue(gameId, out var game))
+            {
+                ViewBag.GameId = gameId;
+                ViewBag.Username = HttpContext.Session.GetString("Username") ?? "Unknown";
 
-			ViewBag.GameId = gameId;
+                // Skicka med hela spelobjektet till vyn
+                return View(game);
+            }
 
-			return View();
-		}
-	}
+            // Om spelet inte finns, kasta tillbaka till startsidan
+            return RedirectToAction("Index", "Home");
+        }
+    }
 }
