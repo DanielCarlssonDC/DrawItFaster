@@ -5,22 +5,22 @@
     var myUsername = ViewBag.Username;
 }
 
-<div class="container-fluid mt-3" style="max-width: 1200px;">
-
-    <div class="d-flex justify-content-between align-items-center mb-3 text-white px-3">
+<div class="container-fluid d-flex flex-column px-3 pb-3 pt-1 w-100" style="max-width: 1400px; height: calc(100vh - 120px); min-height: 600px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-2 text-white flex-shrink-0">
         <h3 id="roundDisplay" class="m-0 fw-bold">Round @Model.CurrentRound/@Model.MaxRounds</h3>
-
+        
         <h4 id="wordDisplay" class="m-0 text-center flex-grow-1" style="letter-spacing: 2px;">Waiting for game to start...</h4>
 
-        <div class="bg-white text-dark rounded-circle d-flex justify-content-center align-items-center fw-bold fs-3 shadow" style="width: 60px; height: 60px;">
+        <div class="bg-white text-dark rounded-circle d-flex justify-content-center align-items-center fw-bold fs-3 shadow" style="width: 50px; height: 50px;">
             <span id="timerDisplay">90</span>
         </div>
     </div>
 
-    <div class="row g-3 h-100">
-
-        <div class="col-md-2">
-            <div class="card h-100 p-2 shadow" style="min-height: 500px;">
+    <div class="row g-3 flex-grow-1" style="min-height: 0;">
+        
+        <div class="col-md-2 h-100">
+            <div class="card h-100 p-2 shadow" style="min-height: 0; overflow-y: auto;">
                 <ul id="playersList" class="list-unstyled m-0 d-flex flex-column gap-2">
                     @foreach (var player in Model.Players)
                     {
@@ -36,41 +36,38 @@
             </div>
         </div>
 
-        <div class="col-md-7 d-flex flex-column">
-            <div class="card p-0 shadow overflow-hidden position-relative" style="flex-grow: 1;">
-
+        <div class="col-md-7 h-100 d-flex flex-column">
+            
+            <div class="card p-0 shadow position-relative flex-grow-1" style="min-height: 0; overflow: hidden;">
                 <div id="canvasOverlay" class="position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center" style="background: rgba(0,0,0,0.7); z-index: 10;">
-                    <h2 class="text-white fw-bold mb-4" id="overlayText">Waiting for next turn...</h2>
-
+                    <h2 class="text-white fw-bold mb-4 text-center" id="overlayText">Waiting for next turn...</h2>
                     <div id="wordOptions" class="d-none d-flex flex-wrap gap-3 justify-content-center"></div>
                 </div>
-
-                <canvas id="drawingCanvas" class="w-100 bg-white" style="cursor: crosshair; height: 500px; display: block;"></canvas>
+                <canvas id="drawingCanvas" class="w-100 h-100 bg-white" style="cursor: crosshair; display: block;"></canvas>
             </div>
 
-            <div class="card mt-2 p-2 shadow d-flex flex-row align-items-center gap-3">
+            <div class="card mt-2 p-2 shadow d-flex flex-row align-items-center gap-3 flex-shrink-0">
                 <div class="d-flex align-items-center gap-2">
                     <label class="fw-bold text-white m-0">Color:</label>
                     <input type="color" id="colorPicker" value="#000000" class="form-control form-control-color p-1" style="width: 40px; height: 40px;" />
                 </div>
-
                 <div class="d-flex align-items-center gap-2 flex-grow-1">
                     <label class="fw-bold text-white m-0">Size:</label>
                     <input type="range" id="brushSize" min="1" max="20" value="2" class="form-range" />
                 </div>
-
                 <button id="eraserButton" class="btn btn-light fw-bold">Eraser</button>
                 <button id="clearCanvasButton" class="btn btn-danger fw-bold">Clear</button>
             </div>
         </div>
 
-        <div class="col-md-3 d-flex flex-column">
-            <div class="card shadow p-2 d-flex flex-column h-100" style="min-height: 500px;">
-                <h5 class="text-white fw-bold border-bottom pb-2 border-secondary">Chat & Guesses</h5>
-
-                <ul id="messagesList" class="list-unstyled flex-grow-1 overflow-auto mb-2 text-white" style="max-height: 430px; display: flex; flex-direction: column; justify-content: flex-end;"></ul>
-
-                <div class="d-flex gap-2 mt-auto">
+        <div class="col-md-3 h-100">
+            <div class="card shadow p-2 d-flex flex-column h-100" style="min-height: 0;">
+                
+                <h5 class="text-white fw-bold border-bottom pb-2 border-secondary flex-shrink-0">Chat & Guesses</h5>
+                
+                <ul id="messagesList" class="list-unstyled flex-grow-1 overflow-auto mb-2 text-white" style="min-height: 0;"></ul>
+                
+                <div class="d-flex gap-2 mt-auto flex-shrink-0">
                     <input id="guessInput" class="form-control" placeholder="Type your guess here..." autocomplete="off" />
                     <button id="guessButton" class="btn btn-success fw-bold">Send</button>
                 </div>
@@ -98,7 +95,7 @@
             canvas.height = canvas.offsetHeight;
         }
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        setTimeout(resizeCanvas, 100);
 
         const colorPicker = document.getElementById("colorPicker");
         const brushSize = document.getElementById("brushSize");
@@ -122,7 +119,7 @@
         let lastX = 0;
         let lastY = 0;
         let timerInterval;
-        let mySelectedWord = ""; // Sparar ordet lokalt för ritaren
+        let mySelectedWord = "";
 
         colorPicker.addEventListener("change", () => { currentColor = colorPicker.value; isErasing = false; });
         brushSize.addEventListener("change", () => { currentSize = brushSize.value; });
@@ -161,17 +158,18 @@
         canvas.addEventListener("mouseup", () => { isDrawing = false; });
         canvas.addEventListener("mouseout", () => { isDrawing = false; });
 
-        // Uppdaterad chatt-funktion för rätt färger
-        function addChatMessage(user, message, isSystem = false) {
+        function addChatMessage(user, message, msgType = 'normal') {
             const li = document.createElement("li");
             li.classList.add("mb-1");
 
-            if (isSystem) {
-                li.style.color = "#39ff14"; // Neongrön
+            if (msgType === 'correct') {
+                li.style.color = "#39ff14"; // Green
                 li.classList.add("fw-bold");
                 li.innerText = message;
+            } else if (msgType === 'system') {
+                li.classList.add("text-white", "fw-bold");
+                li.innerText = message;
             } else {
-                // text-info ger en snygg blå/cyan färg till namnet
                 li.innerHTML = `<span class="text-info fw-bold">${user}:</span> <span class="text-white">${message}</span>`;
             }
 
@@ -190,8 +188,9 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
+                    // Calls for timeup, pauses for 5s
                     if (isDrawer) {
-                        connection.invoke("NextTurn", gameId);
+                        connection.invoke("TimeUp", gameId);
                     }
                 }
             }, 1000);
@@ -211,11 +210,11 @@
         });
 
         connection.on("ReceiveMessage", (user, message) => {
-            addChatMessage(user, message, false); // false = vanligt spelarmeddelande
+            addChatMessage(user, message, 'normal');
         });
 
         connection.on("CorrectGuess", (username, score, drawerName, drawerScore) => {
-            addChatMessage("", `${username} has guessed the word!`, true); // true = grönt systemmeddelande
+            addChatMessage("", `${username} has guessed the word!`, 'correct');
 
             document.getElementById(`score-${username}`).innerText = score;
             document.getElementById(`score-${drawerName}`).innerText = drawerScore;
@@ -226,10 +225,23 @@
             }
         });
 
+        // Receive reason from server
+        connection.on("TurnEnded", (correctWord, reason) => {
+            clearInterval(timerInterval);
+            canvasOverlay.classList.remove("d-none");
+            wordOptions.classList.add("d-none");
+
+            // Show reason as text to players
+            overlayText.innerText = `${reason} The word was: ${correctWord}`;
+            addChatMessage("", `The word was: ${correctWord}`, 'system');
+        });
+
         connection.on("DrawerSelected", (drawerUsername, round) => {
             document.getElementById("roundDisplay").innerText = `Round ${round}/@Model.MaxRounds`;
             clearInterval(timerInterval);
             timerDisplay.innerText = "90";
+            // Clear canvas for new player
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             document.querySelectorAll("#playersList li").forEach(li => li.classList.remove("border-primary", "border-3"));
             document.getElementById(`player-${drawerUsername}`).classList.add("border-primary", "border-3");
@@ -251,10 +263,10 @@
 
                         words.forEach(word => {
                             const btn = document.createElement("button");
-                            btn.className = "btn btn-primary btn-lg fw-bold px-4 shadow"; // Större knappar (btn-lg)
+                            btn.className = "btn btn-primary btn-lg fw-bold px-4 shadow";
                             btn.textContent = word;
                             btn.onclick = () => {
-                                mySelectedWord = word; // Spara ordet lokalt!
+                                mySelectedWord = word;
                                 connection.invoke("SelectWord", gameId, myUsername, word);
                                 wordOptions.classList.add("d-none");
                                 overlayText.innerText = "Starting round...";
@@ -270,7 +282,6 @@
                 wordOptions.classList.add("d-none");
                 canvasOverlay.classList.remove("d-none");
 
-                // Endast ett meddelande nu för att undvika dubletter
                 overlayText.innerText = `${drawerUsername} is choosing a word...`;
                 wordDisplay.innerText = "Waiting for drawer...";
             }
@@ -281,12 +292,11 @@
             startTimer(seconds);
 
             if (isDrawer) {
-                addChatMessage("", `You are drawing! The word is hidden for others.`, true);
-                // Använder det lokalt sparade ordet!
+                addChatMessage("", `You are drawing! The word is hidden for others.`, 'system');
                 wordDisplay.innerText = `Draw the word! (${mySelectedWord})`;
             } else {
                 wordDisplay.innerText = "Guess the word!";
-                addChatMessage("", `Round started! Guess what is being drawn!`, true);
+                addChatMessage("", `Round started! Guess what is being drawn!`, 'system');
             }
         });
 
@@ -294,11 +304,10 @@
             clearInterval(timerInterval);
             canvasOverlay.classList.remove("d-none");
             let winner = playersList[0];
-            overlayText.innerHTML = `Game Over!<br>Winner: ${winner.username} with ${winner.score} pts!<br><a href='/' class='btn btn-light mt-3'>Back to Lobby</a>`;
+            overlayText.innerHTML = `Game Over!<br>Winner: ${winner.username} with ${winner.score} pts!<br><a href='/Home/Index' class='btn btn-light mt-3'>Back to Home</a>`;
         });
 
         connection.start().then(() => {
-            console.log("Connected to GameHub");
             return connection.invoke("JoinGame", gameId, myUsername);
         }).then(() => {
             const isHost = @((Model.HostId == Context.Session.GetInt32("UserId")).ToString().ToLower());

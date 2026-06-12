@@ -63,7 +63,7 @@
 
         connection.on("GameStarted", (startedGameCode) => {
             console.log("GameStarted:", startedGameCode);
-            window.location.href = `/Game/Game?gameId=${startedGameCode}`;
+            window.location.href = `/Game/room?gameId=${startedGameCode}`;
         });
 
         async function loadPlayers() {
